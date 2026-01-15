@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Examen Istorie .AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root { --navy: #001F3F; --gold: #D4AF37; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #Fdfbf7;
+            height: 100vh; height: 100dvh;
+        }
+
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .serif { font-family: 'Playfair Display', serif; }
+        .hidden-lang { display: none !important; }
+        .lang-btn.active { background-color: #D4AF37; color: #001F3F; font-weight: bold; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .tab-active { background-color: var(--navy); color: white; border: 1px solid var(--navy); }
+        .tab-inactive { background-color: white; color: #6B7280; border: 1px solid #E5E7EB; }
+        
+        .recording { animation: pulseRed 1.5s infinite; background-color: #fee2e2 !important; color: #dc2626 !important; border-color: #dc2626 !important; }
+        @keyframes pulseRed { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
+
+        .live-active { box-shadow: 0 0 15px rgba(212, 175, 55, 0.8); border-color: #FFD700 !important; }
+
+        .btn-wrapper { position: relative; display: flex; align-items: center; justify-content: center; z-index: 20; }
+
+        .action-label {
+            position: absolute; top: -36px; left: 50%; transform: translateX(-50%);
+            font-size: 9px; font-weight: bold; padding: 3px 8px; border-radius: 8px;
+            white-space: nowrap; pointer-events: none; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            opacity: 0.95; transition: all 0.3s; z-index: 30;
+            /* AMBELE SUNT ACUM GOLD */
+            background: #D4AF37; color: #001F3F; border: 1px solid #B4941F; animation: bounce-tiny 3s infinite;
+        }
+
+        .action-label::after { 
+            content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); 
+            border-width: 4px; border-style: solid; 
+            border-color: #B4941F transparent transparent transparent; 
+        }
+
+        @keyframes bounce-tiny { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-3px); } }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex flex-col overflow-hidden text-slate-800">
+
+    <header class="bg-white/90 backdrop-blur-md border-b h-16 flex-none z-50 flex items-center justify-between px-4 shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-[#001F3F] rounded-lg flex items-center justify-center text-[#D4AF37] shadow-lg">
+                <i class="fas fa-landmark text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-[#001F3F] text-sm md:text-base leading-tight">Examen<span class="text-[#D4AF37]">.AI</span></h1>
+                <p class="text-[9px] text-gray-500 tracking-wider">ISTORIE MOLDOVA</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="flex bg-gray-100 rounded p-1">
+                <button onclick="setLang('ro')" id="btn-ro" class="lang-btn active px-2 py-1 text-[10px] rounded transition-all cursor-pointer">RO</button>
+                <button onclick="setLang('ru')" id="btn-ru" class="lang-btn px-2 py-1 text-[10px] rounded transition-all cursor-pointer">RU</button>
+            </div>
+            <button onclick="openFeedback()" class="md:hidden w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-xs ml-1">
+                <i class="fas fa-lightbulb"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden relative">
+        <aside class="w-72 bg-white/80 backdrop-blur border-r flex-none hidden lg:flex flex-col z-20">
+            <div class="p-3 bg-[#001F3F]/5 border-b flex flex-col gap-2">
+                <div class="flex gap-1">
+                    <button onclick="switchLevel('9')" id="tab-9" class="flex-1 py-2 rounded text-[10px] font-bold tab-active transition-all shadow-sm cursor-pointer">
+                        <span class="lang-ro">Clasa 9</span><span class="lang-ru hidden-lang">9 Класс</span>
+                    </button>
+                    <button onclick="switchLevel('12')" id="tab-12" class="flex-1 py-2 rounded text-[10px] font-bold tab-inactive transition-all shadow-sm cursor-pointer">
+                        <span class="lang-ro">BAC (12)</span><span class="lang-ru hidden-lang">БАК (12)</span>
+                    </button>
+                    <button onclick="switchLevel('olimp')" id="tab-olimp" class="flex-1 py-2 rounded text-[10px] font-bold tab-inactive transition-all shadow-sm cursor-pointer">
+                        <span class="lang-ro">Olimp</span><span class="lang-ru hidden-lang">Олимп</span>
+                    </button>
+                </div>
+                <p id="current-level-title" class="text-xs font-bold text-[#001F3F] text-center mt-1 uppercase tracking-wide">Examen Gimnazial</p>
+            </div>
+            <div id="exam-menu" class="space-y-1 p-2 overflow-y-auto flex-1 custom-scrollbar"></div>
+            <div class="p-4 border-t text-[10px] text-center text-gray-400 bg-white">
+                <button onclick="openFeedback()" class="w-full bg-yellow-50 hover:bg-yellow-100 text-yellow-700 py-2 rounded-lg font-bold mb-3 border border-yellow-200 transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-lightbulb"></i> 
+                    <span class="lang-ro">Feedback / Sugestii</span>
+                    <span class="lang-ru hidden-lang">Отзыв / Предложения</span>
+                </button>
+                <button onclick="openLegal('terms')" class="hover:text-[#001F3F] underline cursor-pointer">Termeni</button> • 
+                <button onclick="openLegal('privacy')" class="hover:text-[#001F3F] underline cursor-pointer">Confidențialitate</button>
+                <div class="mt-1 opacity-50">© 2026 Contact AI Solutions</div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col relative w-full">
+            <div id="chatHistory" class="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth pb-40">
+                <div onclick="shareApp()" class="cursor-pointer bg-gradient-to-r from-yellow-50 to-amber-50 border border-amber-100 p-3 rounded-xl shadow-sm mb-4 flex items-center justify-between group hover:shadow-md transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center flex-none">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div class="text-xs text-amber-900 leading-tight">
+                            <span class="lang-ro"><strong>Îți place Profesorul AI?</strong> Trimite-l unui coleg și păstrează accesul gratuit!</span>
+                            <span class="lang-ru hidden-lang"><strong>Нравится ИИ-учитель?</strong> Отправь другу и сохрани бесплатный доступ!</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right text-amber-300 group-hover:text-amber-500 transition-colors"></i>
+                </div>
+
+                <div class="flex gap-3 max-w-3xl mx-auto fade-in mt-2">
+                    <div class="w-10 h-10 rounded-full bg-[#001F3F] flex-none flex items-center justify-center text-[#D4AF37] shadow-md border-2 border-[#D4AF37]">
+                        <i class="fas fa-graduation-cap text-lg"></i>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl rounded-tl-none shadow-sm border border-gray-200 relative">
+                        <h2 class="text-base font-bold text-[#001F3F] mb-2 serif">
+                            <span class="lang-ro">Salut! Sunt Profesorul tău AI.</span>
+                            <span class="lang-ru hidden-lang">Привет! Я твой ИИ-учитель.</span>
+                        </h2>
+                        <p class="text-sm text-gray-600 mb-3 leading-relaxed">
+                            <span class="lang-ro">Sunt aici să te ajut cu Istoria Românilor și Universală. Avem acces <strong>NELIMITAT</strong> în luna Ianuarie 2026. Profită și întreabă-mă orice!</span>
+                            <span class="lang-ru hidden-lang">Я здесь, чтобы помочь с Историей Румын и Всеобщей историей. У нас <strong>БЕЗЛИМИТНЫЙ</strong> доступ в январе 2026. Спрашивай что угодно!</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-0 left-0 w-full bg-white/95 backdrop-blur border-t p-3 z-30 pb-safe">
+                <div class="max-w-3xl mx-auto">
+                    <div id="uploadPreview" class="hidden mb-2 bg-blue-50 p-2 rounded-lg flex justify-between items-center text-xs text-blue-800 border border-blue-100">
+                        <span id="fileName" class="truncate font-medium">file.doc</span> 
+                        <button onclick="clearUpload()" class="w-5 h-5 flex items-center justify-center hover:bg-blue-100 rounded-full cursor-pointer">✕</button>
+                    </div>
+
+                    <form onsubmit="handleUserAction(event)" class="flex gap-2 items-end bg-white p-1.5 rounded-2xl border-2 border-gray-100 focus-within:border-[#001F3F] transition-colors shadow-sm relative z-50">
+                        <div class="relative group z-50">
+                            <button type="button" onclick="document.getElementById('fileInput').click()" class="p-3 text-gray-400 hover:text-[#001F3F] transition-colors cursor-pointer">
+                                <i class="fas fa-paperclip text-lg"></i>
+                            </button>
+                            <input type="file" id="fileInput" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt" onchange="handleFile(this)">
+                        </div>
+
+                        <textarea id="userInput" rows="1" class="flex-1 bg-transparent border-none text-sm focus:ring-0 resize-none py-3 px-2 max-h-32" placeholder="..."></textarea>
+
+                        <div class="btn-wrapper">
+                            <div class="action-label lang-ro">Dictează</div>
+                            <div class="action-label lang-ru hidden-lang">Диктуй</div>
+                            <button type="button" onclick="startDictation()" id="btnDictate" 
+                                class="w-12 h-12 rounded-xl bg-gray-50 text-gray-600 hover:bg-[#001F3F] hover:text-[#D4AF37] border border-gray-200 shadow-sm flex items-center justify-center transition-all cursor-pointer">
+                                <i class="fas fa-microphone text-lg"></i>
+                            </button>
+                        </div>
+
+                        <div class="btn-wrapper">
+                            <div class="action-label lang-ro">Discută</div>
+                            <div class="action-label lang-ru hidden-lang">Обсуди</div>
+                            <button type="button" onclick="toggleLiveConversation()" id="btnLive" 
+                                class="w-12 h-12 rounded-xl bg-gray-100 text-gray-600 hover:bg-[#001F3F] hover:text-[#D4AF37] border border-gray-200 shadow-sm flex items-center justify-center transition-all cursor-pointer">
+                                <i class="fas fa-headset text-lg"></i>
+                            </button>
+                        </div>
+
+                        <button type="submit" class="w-12 h-10 bg-[#001F3F] text-[#D4AF37] rounded-xl hover:bg-blue-900 shadow-md flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer z-50">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    
+                    <p class="text-center text-[9px] text-gray-400 mt-2 mb-1">
+                        Powered by <span class="font-bold text-[#001F3F]">RuslanOS</span> • Contact AI Solutions
+                    </p>
+                    <p class="text-center text-[8px] text-blue-500/80 hidden md:block pb-1">
+                        <i class="fab fa-edge"></i> 
+                        <span class="lang-ro">Pe PC recomandăm <b>Microsoft Edge</b>.</span>
+                        <span class="lang-ru hidden-lang">На ПК рекомендуем <b>Microsoft Edge</b>.</span>
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-feedback" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full relative shadow-2xl">
+            <h2 class="font-bold text-lg mb-4 text-[#001F3F] serif text-center"><span class="lang-ro">Feedback</span><span class="lang-ru hidden-lang">Отзыв</span></h2>
+            <p class="text-sm text-gray-600 mb-4 text-center"><span class="lang-ro">Cum pot face Profesorul AI mai bun pentru tine?</span><span class="lang-ru hidden-lang">Как сделать ИИ-учителя лучше для тебя?</span></p>
+            <textarea id="feedbackText" class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-[#001F3F] outline-none mb-4" rows="4" placeholder="..."></textarea>
+            <div class="flex gap-2">
+                <button onclick="closeLegal('feedback')" class="flex-1 py-2.5 rounded-xl text-gray-500 bg-gray-100 font-bold">Anulează</button>
+                <button onclick="sendFeedback()" class="flex-1 py-2.5 rounded-xl text-white bg-green-600 font-bold">Trimite</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-terms" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 max-w-lg w-full relative shadow-2xl max-h-[80vh] overflow-y-auto">
+            <button onclick="closeLegal('terms')" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 cursor-pointer"><i class="fas fa-times text-xl"></i></button>
+            <h2 class="font-bold text-lg mb-4 text-[#001F3F] serif border-b pb-2">Termeni și Condiții</h2>
+            <div class="text-xs text-gray-600 space-y-3 leading-relaxed">
+                <p><strong>1. Operatorul:</strong> Site-ul "Examen-la-Istorie.AI" este proprietatea platformei <strong>contact-ai.online</strong>, controlată de persoană fizică înregistrată în Republica Moldova.</p>
+                <p><strong>2. Contact:</strong> <a href="mailto:ruslan@contact_ai.online" class="text-blue-600 underline">ruslan@contact_ai.online</a>.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal-privacy" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 max-w-lg w-full relative shadow-2xl max-h-[80vh] overflow-y-auto">
+            <button onclick="closeLegal('privacy')" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 cursor-pointer"><i class="fas fa-times text-xl"></i></button>
+            <h2 class="font-bold text-lg mb-4 text-[#001F3F] serif border-b pb-2">Politica de Confidențialitate</h2>
+            <div class="text-xs text-gray-600 space-y-3 leading-relaxed">
+                <p><strong>1. Cadrul Legal:</strong> Legea Nr. 133 din 08.07.2011 privind protecția datelor cu caracter personal.</p>
+                <p><strong>2. Date:</strong> Nu colectăm date personale sensibile.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const N8N_WEBHOOK = '/api/chat';
+        const FEEDBACK_WEBHOOK = 'https://control.contact-ai.online/webhook/feedback-ai'; 
+        let unique_id = localStorage.getItem('user_uid') || 'u-' + Date.now();
+        localStorage.setItem('user_uid', unique_id);
+
+        let currentLang = 'ro';
+        let currentLevel = '9';
+        let isDictating = false;
+        let isLiveMode = false;
+        let recognition = null;
+        let synthesis = window.speechSynthesis;
+
+        const menus = {
+            '9': {
+                'ro': [ {t:'Subiectul I - Surse', d:'Analiza documentelor'}, {t:'Subiectul II - Personalități', d:'Rolul personalităților'}, {t:'Subiectul III - Harta', d:'Analiza hărților 1940'}, {t:'Subiectul IV - Argument', d:'Text argumentativ'} ],
+                'ru': [ {t:'Субъект I - Источники', d:'Анализ документов'}, {t:'Субъект II - Личности', d:'Роль личностей'}, {t:'Субъект III - Карта', d:'Карты 1940 года'}, {t:'Субъект IV - Аргумент', d:'Аргументированный текст'} ]
+            },
+            '12': {
+                'ro': [ {t:'Subiectul I - Tratate', d:'Relații internaționale'}, {t:'Subiectul II - Personalitate', d:'Fisă de evaluare'}, {t:'Subiectul III - Cronologie', d:'Sincronizare evenimente'}, {t:'Subiectul IV - Eseu', d:'Democrație vs Totalitarism'} ],
+                'ru': [ {t:'Субъект I - Договоры', d:'Международные отношения'}, {t:'Субъект II - Личность', d:'Оценка личности'}, {t:'Субъект III - Хронология', d:'Синхронизация событий'}, {t:'Субъект IV - Эссе', d:'Демократия vs Тоталитаризм'} ]
+            },
+            'olimp': {
+                'ro': [ {t:'Analiză Comparativă', d:'Surse antice/medievale'}, {t:'Demografie Istorică', d:'Grafice populație'}, {t:'Etnogeneza', d:'Teorii și izvoare'} ],
+                'ru': [ {t:'Сравнительный Анализ', d:'Древние источники'}, {t:'Демография', d:'Графики населения'}, {t:'Этногенез', d:'Теории и источники'} ]
+            }
+        };
+
+        function init() {
+            setLang(localStorage.getItem('app_lang') || 'ro');
+            setWallpaper();
+            if (synthesis.onvoiceschanged !== undefined) synthesis.onvoiceschanged = () => { console.log("Voices ready"); };
+        }
+
+        function setWallpaper() {
+            var p1 = "data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E";
+            var p2 = "%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.05'%3E";
+            var p3 = "%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E";
+            document.body.style.backgroundImage = 'url("' + p1 + p2 + p3 + '")';
+        }
+
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('app_lang', lang);
+            document.querySelectorAll('.lang-ro').forEach(el => el.classList.toggle('hidden-lang', lang !== 'ro'));
+            document.querySelectorAll('.lang-ru').forEach(el => el.classList.toggle('hidden-lang', lang !== 'ru'));
+            document.getElementById('btn-ro').className = `lang-btn px-2 py-1 text-[10px] rounded transition-all cursor-pointer ${lang === 'ro' ? 'active' : ''}`;
+            document.getElementById('btn-ru').className = `lang-btn px-2 py-1 text-[10px] rounded transition-all cursor-pointer ${lang === 'ru' ? 'active' : ''}`;
+            document.getElementById('userInput').placeholder = lang === 'ro' ? 'Întreabă despre Ștefan cel Mare...' : 'Спроси про Штефана чел Маре...';
+            switchLevel(currentLevel);
+        }
+
+        function switchLevel(lvl) {
+            currentLevel = lvl;
+            ['9','12','olimp'].forEach(id => {
+                const btn = document.getElementById(`tab-${id}`);
+                btn.className = `flex-1 py-2 rounded text-[10px] font-bold transition-all shadow-sm cursor-pointer ${id === lvl ? 'tab-active' : 'tab-inactive'}`;
+            });
+            const titles = { '9': {'ro': 'Examen Gimnazial (Clasa 9)', 'ru': 'Гимназический Экзамен (9 Класс)'}, '12': {'ro': 'Examen BAC (Clasa 12)', 'ru': 'Экзамен БАК (12 Класс)'}, 'olimp': {'ro': 'Pregătire Olimpiadă', 'ru': 'Подготовка к Олимпиаде'} };
+            document.getElementById('current-level-title').innerText = titles[lvl][currentLang];
+            const menuContainer = document.getElementById('exam-menu');
+            menuContainer.innerHTML = '';
+            menus[lvl][currentLang].forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'p-3 hover:bg-blue-50 rounded-xl cursor-pointer mb-2 border border-transparent hover:border-blue-100 transition-all bg-white shadow-sm';
+                itemDiv.onclick = function() { trigger(item.t); };
+                itemDiv.innerHTML = `<h4 class="text-xs font-bold text-[#001F3F]">${item.t}</h4><p class="text-[9px] text-gray-400 mt-0.5">${item.d}</p>`;
+                menuContainer.appendChild(itemDiv);
+            });
+        }
+
+        function trigger(topic) {
+            const prompt = currentLang === 'ro' ? "Explică: " + topic : "Объясни: " + topic;
+            sendMessage(prompt, true);
+        }
+
+        async function sendMessage(text, isAuto = false) {
+            if(!text.trim()) return;
+            if(!isAuto) { addMsg(text, 'user'); document.getElementById('userInput').value = ''; } 
+            else { addMsg(text, 'user'); }
+
+            const loadId = 'load-' + Date.now();
+            let spinner = '<div id="' + loadId + '" class="flex gap-3 fade-in mt-4">' +
+                '<div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">' +
+                '<div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>' +
+                '<div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>' +
+                '<div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>' +
+                '</div></div>';
+            
+            document.getElementById('chatHistory').innerHTML += spinner;
+            document.getElementById('chatHistory').scrollTop = document.getElementById('chatHistory').scrollHeight;
+
+            const formData = new FormData();
+            formData.append('message', text);
+            formData.append('userId', unique_id);
+            formData.append('language', currentLang);
+            formData.append('level', currentLevel);
+            const fileInput = document.getElementById('fileInput');
+            if(fileInput.files.length > 0) formData.append('image', fileInput.files[0]);
+
+            try {
+                const response = await fetch(N8N_WEBHOOK, { method: 'POST', body: formData });
+                const data = await response.json();
+                document.getElementById(loadId).remove();
+                const aiText = data.output || "Error.";
+                addMsg(aiText, 'ai');
+                if(isLiveMode) { await waitForVoices(); speakText(aiText); }
+                clearUpload();
+            } catch (e) {
+                document.getElementById(loadId)?.remove();
+                addMsg("Connection error.", 'ai');
+            }
+        }
+
+        function addMsg(text, role) {
+            const history = document.getElementById('chatHistory');
+            const isUser = role === 'user';
+            let html = '';
+            if (isUser) {
+                html = '<div class="flex justify-end fade-in"><div class="bg-[#001F3F] text-white p-4 rounded-2xl rounded-tr-none max-w-[85%] text-sm shadow-md leading-relaxed">' + text.replace(/\n/g, '<br>') + '</div></div>';
+            } else {
+                html = '<div class="flex gap-3 fade-in mt-4"><div class="w-10 h-10 rounded-full bg-[#001F3F] flex-none flex items-center justify-center text-[#D4AF37] shadow-md border-2 border-[#D4AF37]"><i class="fas fa-robot"></i></div>' + 
+                       '<div class="bg-white p-5 rounded-2xl rounded-tl-none shadow-sm border border-gray-200 text-sm text-gray-800 max-w-[90%] leading-relaxed">' + formatMarkdown(text) + '</div></div>';
+            }
+            history.innerHTML += html;
+            history.scrollTop = history.scrollHeight;
+        }
+
+        function formatMarkdown(text) { return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>'); }
+
+        function shareApp() {
+            const url = window.location.href;
+            const title = "Examen Istorie AI";
+            const text = "Am găsit un profesor AI gratuit pentru istorie! Intră și tu:";
+            if (navigator.share) navigator.share({ title: title, text: text, url: url });
+            else { navigator.clipboard.writeText(url); alert(currentLang === 'ro' ? "Link copiat!" : "Ссылка скопирована!"); }
+        }
+
+        function openFeedback() { document.getElementById('modal-feedback').classList.remove('hidden'); }
+        async function sendFeedback() {
+            const txt = document.getElementById('feedbackText').value;
+            if(!txt.trim()) return;
+            closeLegal('feedback');
+            document.getElementById('feedbackText').value = '';
+            alert(currentLang === 'ro' ? "Mulțumim!" : "Спасибо!");
+            // FIX: Removed extra body wrapping
+            const data = { feedback_text: txt, device_type: navigator.userAgent, timestamp: new Date().toISOString() };
+            try { await fetch(FEEDBACK_WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); } catch(e) {}
+        }
+
+        function startDictation() {
+            if(isLiveMode) toggleLiveConversation(); 
+            if (!('webkitSpeechRecognition' in window)) { alert("Necesită Chrome/Edge."); return; }
+            const btn = document.getElementById('btnDictate');
+            btn.classList.add('recording');
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = currentLang === 'ro' ? 'ro-RO' : 'ru-RU';
+            recognition.interimResults = false;
+            recognition.onresult = function(event) { const t = event.results[0][0].transcript; document.getElementById('userInput').value = t; };
+            recognition.onend = function() { btn.classList.remove('recording'); };
+            recognition.start();
+        }
+
+        function toggleLiveConversation() {
+            if(isDictating) startDictation(); 
+            isLiveMode = !isLiveMode;
+            const btnLive = document.getElementById('btnLive');
+            if(isLiveMode) { btnLive.classList.add('live-active'); runLiveListen(); } 
+            else { btnLive.classList.remove('live-active'); if(recognition) recognition.stop(); synthesis.cancel(); }
+        }
+
+        function runLiveListen() {
+            if(!isLiveMode) return;
+            if (!('webkitSpeechRecognition' in window)) { alert("Chrome required."); return; }
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = currentLang === 'ro' ? 'ro-RO' : 'ru-RU';
+            recognition.interimResults = false;
+            recognition.onstart = function() { document.getElementById('btnLive').style.borderColor = 'red'; };
+            recognition.onresult = function(event) { const t = event.results[0][0].transcript; document.getElementById('userInput').value = t; sendMessage(t); };
+            recognition.onend = function() { document.getElementById('btnLive').style.borderColor = '#D4AF37'; };
+            recognition.start();
+        }
+
+        function waitForVoices() {
+            return new Promise((resolve) => {
+                const voices = synthesis.getVoices();
+                if (voices.length > 0) { resolve(voices); return; }
+                synthesis.onvoiceschanged = () => resolve(synthesis.getVoices());
+                setTimeout(() => resolve([]), 2000); 
+            });
+        }
+
+        async function speakText(text) {
+            if(!synthesis) return;
+            synthesis.cancel();
+            let cleanText = text.replace(/[*#_`\-]/g, '').replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1'); 
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = currentLang === 'ro' ? 'ro-RO' : 'ru-RU';
+            const voices = await waitForVoices();
+            let targetLangCode = currentLang === 'ro' ? 'ro' : 'ru';
+            let selectedVoice = voices.find(v => v.lang.toLowerCase().includes(targetLangCode));
+            if(selectedVoice) utterance.voice = selectedVoice;
+            else console.warn("Using default voice.");
+            synthesis.speak(utterance);
+        }
+
+        function handleUserAction(e) { e.preventDefault(); sendMessage(document.getElementById('userInput').value); }
+        function handleFile(input) { if(input.files[0]) { document.getElementById('uploadPreview').classList.remove('hidden'); document.getElementById('uploadPreview').classList.add('flex'); document.getElementById('fileName').innerText = input.files[0].name; } }
+        function clearUpload() { document.getElementById('fileInput').value = ''; document.getElementById('uploadPreview').classList.add('hidden'); document.getElementById('uploadPreview').classList.remove('flex'); }
+        function openLegal(id) { document.getElementById('modal-'+id).classList.remove('hidden'); }
+        function closeLegal(id) { document.getElementById('modal-'+id).classList.add('hidden'); }
+
+        init();
+    </script>
+</body>
+</html>
