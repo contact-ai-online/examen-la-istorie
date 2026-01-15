@@ -11,10 +11,10 @@ export async function onRequest(context) {
     const formData = await context.request.formData();
     const userMessage = formData.get('message');
     
-    // AM PUS CHEIA DIRECT AICI (VARIANTA SIGURĂ):
     const apiKey = "AIzaSyClp9SGRprmLkXwWmm2oUEdSbRZ5u-Mr5c"; 
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // AM ACTUALIZAT URL-ul la versiunea v1 (stabila)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const aiResponse = await fetch(geminiUrl, {
       method: "POST",
