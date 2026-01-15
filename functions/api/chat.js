@@ -10,20 +10,16 @@ export async function onRequest(context) {
   try {
     const formData = await context.request.formData();
     const userMessage = formData.get('message');
-    
-    // CHEIA TA DIRECTĂ
     const apiKey = "AIzaSyClp9SGRprmLkXwWmm2oUEdSbRZ5u-Mr5c"; 
 
-    // MODELUL LATEST (Cel mai sigur pentru 2026)
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    // Folosim modelul gemini-pro - cel mai stabil model din istoria lor
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
     const aiResponse = await fetch(geminiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: userMessage }]
-        }]
+        contents: [{ parts: [{ text: userMessage }] }]
       })
     });
 
@@ -42,6 +38,6 @@ export async function onRequest(context) {
     });
 
   } catch (error) {
-    return new Response(JSON.stringify({ output: "Eroare sistem: " + error.message }), { headers: corsHeaders });
+    return new Response(JSON.stringify({ output: "Eroare: " + error.message }), { headers: corsHeaders });
   }
 }
