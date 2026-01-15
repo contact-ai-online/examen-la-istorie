@@ -5,46 +5,38 @@ export async function onRequest(context) {
     "Access-Control-Allow-Headers": "Content-Type",
   };
 
-  if (context.request.method === "OPTIONS") {
-    return new Response("OK", { headers: corsHeaders });
-  }
+  if (context.request.method === "OPTIONS") return new Response("OK", { headers: corsHeaders });
 
   try {
     const formData = await context.request.formData();
     const userMessage = formData.get('message');
-    const level = formData.get('level') || '9';
-    const lang = formData.get('language') || 'ro';
+    
+    // AM PUS CHEIA DIRECT AICI (VARIANTA SIGURĂ):
+    const apiKey = "AIzaSyClp9SGRprmLkXwWmm2oUEdSbRZ5u-Mr5c"; 
 
-    const apiKey = context.env.GEMINI_API_KEY; 
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-    const systemInstruction = lang === 'ro' 
-      ? `Ești un profesor de istorie din Moldova. Nivel clasa ${level}. Răspunde scurt și clar.` 
-      : `Ты учитель истории в Молдове. Класс ${level}. Отвечай кратко и понятно.`;
-
-    const geminiPayload = {
-      contents: [{
-        role: "user",
-        parts: [{ text: systemInstruction + "\n\nÎntrebare: " + userMessage }]
-      }]
-    };
 
     const aiResponse = await fetch(geminiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(geminiPayload)
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: userMessage }] }]
+      })
     });
 
     const aiData = await aiResponse.json();
-    let responseText = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "Nu am primit răspuns.";
+    
+    if (aiData.error) {
+      return new Response(JSON.stringify({ output: "Eroare Google: " + aiData.error.message }), { headers: corsHeaders });
+    }
+
+    let responseText = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "Google nu a oferit un răspuns.";
 
     return new Response(JSON.stringify({ output: responseText }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
 
   } catch (error) {
-    return new Response(JSON.stringify({ output: "Eroare: " + error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" }
-    });
+    return new Response(JSON.stringify({ output: "Eroare Tehnică: " + error.message }), { headers: corsHeaders });
   }
 }
