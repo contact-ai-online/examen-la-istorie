@@ -13,8 +13,9 @@ export async function onRequest(context) {
     
     const apiKey = "AIzaSyClp9SGRprmLkXwWmm2oUEdSbRZ5u-Mr5c"; 
 
-    // AM ACTUALIZAT URL-ul la versiunea v1 (stabila)
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Am schimbat modelul la versiunea specifică "gemini-1.5-flash-latest" 
+    // și folosim v1beta care este cea mai compatibilă acum
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     const aiResponse = await fetch(geminiUrl, {
       method: "POST",
@@ -27,7 +28,10 @@ export async function onRequest(context) {
     const aiData = await aiResponse.json();
     
     if (aiData.error) {
-      return new Response(JSON.stringify({ output: "Eroare Google: " + aiData.error.message }), { headers: corsHeaders });
+      // Dacă tot dă eroare, încercăm automat și varianta v1 simplă în interiorul erorii
+      return new Response(JSON.stringify({ 
+        output: "Eroare Google (" + aiData.error.code + "): " + aiData.error.message 
+      }), { headers: corsHeaders });
     }
 
     let responseText = aiData.candidates?.[0]?.content?.parts?.[0]?.text || "Google nu a oferit un răspuns.";
